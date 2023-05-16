@@ -1,3 +1,5 @@
+const Product = require('../models/product');
+
 exports.getAddProduct = (req, res, next) => {
     res.render('add-product', {
         pageTitle: 'Add Product',
@@ -6,20 +8,19 @@ exports.getAddProduct = (req, res, next) => {
     });
 }
 
-const products = [];
-
 exports.postAddProduct = (req, res, next) => {
-    products.push({
-        title: req.body.title
-    })
+    const product = new Product(req.body.title);
+    product.save();
     res.redirect('/');
 }
 
 exports.getProducts = (req, res, next) => {
-    res.render('shop', {
-        pageTitle: 'Shop',
-        prod: products, path: '/',
-        hasProd: products.length > 0,
-        activeShop: true
+    Product.fetchAll(products => {
+        res.render('shop', {
+            pageTitle: 'Shop',
+            prod: products, path: '/',
+            hasProd: products.length > 0,
+            activeShop: true
+        });
     });
 }
