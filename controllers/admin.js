@@ -9,6 +9,10 @@ exports.getAddProduct = (req, res, next) => {
 }
 
 exports.postAddProduct = (req, res, next) => {
+    const title = req.body.title;
+    const image = req.body.imageUrl;
+    const price = req.body.price;
+    const description = req.body.description;
     const product = new Product(req.body.title);
     product.save();
     res.redirect('/');
