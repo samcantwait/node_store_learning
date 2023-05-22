@@ -1,8 +1,8 @@
-<%- include('layouts/main-layout.ejs') %>
+<%- include('../layouts/main-layout.ejs') %>
 
     <main>
         <h1>My Products</h1>
-        <% if (hasProd) { %>
+        <% if (prod.length> 0) { %>
             <ul>
                 <% for (let product of prod) { %>
                     <li>
@@ -15,4 +15,4 @@
                     <% } %>
     </main>
 
-    <%- include('layouts/partials/end.ejs') %>
+    <%- include('../layouts/partials/end.ejs') %>
