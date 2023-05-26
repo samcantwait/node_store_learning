@@ -4,7 +4,9 @@ const path = require('path');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const page404Controller = require('./controllers/404')
+const page404Controller = require('./controllers/404');
+
+const db = require('./util/database');
 
 const app = express();
 
