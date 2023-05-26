@@ -7,6 +7,8 @@ const shopRoutes = require('./routes/shop');
 const page404Controller = require('./controllers/404');
 
 const sequelize = require('./util/database');
+const Product = require('./models/product');
+const User = require('./models/user');
 
 const app = express();
 
@@ -17,6 +19,15 @@ app.set('views', 'views');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.use((req, res, next) => {
+    User.findByPk(1)
+        .then(user => {
+            req.user = user;
+            next();
+        })
+        .catch(err => console.log(err))
+})
+
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
@@ -24,9 +35,22 @@ app.use(page404Controller.send404);
 
 const PORT = 3000;
 
-sequelize.sync()
+Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Product);
+
+sequelize
+    // .sync({ force: true })
+    .sync()
     .then(result => {
-        // console.log(result)
+        return User.findByPk(1);
+    })
+    .then(user => {
+        if (!user) {
+            return User.create({ name: 'Sam', email: 'sam@samcantwait.com' })
+        }
+        return user;
+    })
+    .then(user => {
         app.listen(PORT, () => {
             console.log(`Connected on port: ${PORT}`)
         })
