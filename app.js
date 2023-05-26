@@ -6,7 +6,7 @@ const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
 const page404Controller = require('./controllers/404');
 
-const db = require('./util/database');
+const sequelize = require('./util/database');
 
 const app = express();
 
@@ -23,6 +23,14 @@ app.use(shopRoutes);
 app.use(page404Controller.send404);
 
 const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Connected on port: ${PORT}`)
-})
+
+sequelize.sync()
+    .then(result => {
+        // console.log(result)
+        app.listen(PORT, () => {
+            console.log(`Connected on port: ${PORT}`)
+        })
+    })
+    .catch(err => console.log(err))
+
+
