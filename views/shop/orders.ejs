@@ -3,8 +3,24 @@
 <%- include('../layouts/partials/navigation.ejs') %>
 
     <main>
-        <h1>
-            <%= pageTitle %>
-        </h1>
+        <% if (!orders.length) { %>
+            <h1>Nothing there!</h1>
+        <% } else { %>
+            <ul>
+                <% orders.forEach(order => { %>
+                <li>
+                    <h1>
+                        # <%= order.id %></li>
+                    </h1>
+                    <ul>
+                        <% order.products.forEach(product => { %>
+                        <li>
+                            <%= product.title %> (<%= product.orderItem.quantity %>)
+                        </li>
+                        <% }) %>
+                    </ul>
+                <% }) %>
+            </ul>
+        <% } %>
     </main>
     <%- include('../layouts/partials/end.ejs') %>
