@@ -10,11 +10,12 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    Product.create({
+    // Sequelize has a createProduct method we can use
+    req.user.createProduct({
         title,
         price,
         imageUrl,
-        description
+        description,
     })
         .then(result => res.redirect('/admin/products'))
         .catch(err => console.log(err))
