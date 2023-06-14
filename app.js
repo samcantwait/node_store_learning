@@ -9,6 +9,10 @@ const page404Controller = require('./controllers/404');
 const sequelize = require('./util/database');
 const Product = require('./models/product');
 const User = require('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-items');
 
 const app = express();
 
@@ -35,8 +39,17 @@ app.use(page404Controller.send404);
 
 const PORT = 3000;
 
+
+// Add associations for sequelize
 Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: OrderItem });
 
 sequelize
     // .sync({ force: true })
@@ -51,6 +64,9 @@ sequelize
         return user;
     })
     .then(user => {
+        return user.createCart();
+    })
+    .then(cart => {
         app.listen(PORT, () => {
             console.log(`Connected on port: ${PORT}`)
         })
