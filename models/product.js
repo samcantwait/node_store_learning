@@ -37,9 +37,25 @@ class Product {
             .find({ _id: new mongodb.ObjectId(id) })
             .next()
             .then(product => {
-                console.log('in porduct class', product)
+                console.log(product)
                 return product;
             })
+            .catch(err => console.log(err));
+    }
+
+    static update(id, title, price, imageUrl, description) {
+        const db = getDb();
+        return db.collection('products')
+            .updateOne({ _id: new mongodb.ObjectId(id) }, { $set: { title, price, imageUrl, description } })
+            .then(result => console.log('updated result: ', result))
+            .catch(err => console.log(err));
+    }
+
+    static delete(id) {
+        const db = getDb()
+        return db.collection('products')
+            .deleteOne({ _id: new mongodb.ObjectId(id) })
+            .then(result => console.log('deleted result: ', result))
             .catch(err => console.log(err));
     }
 }
