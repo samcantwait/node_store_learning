@@ -3,7 +3,7 @@ const path = require('path');
 // const { engine } = require('express-handlebars');
 
 const adminRoutes = require('./routes/admin');
-// const shopRoutes = require('./routes/shop');
+const shopRoutes = require('./routes/shop');
 const page404Controller = require('./controllers/404');
 const mongoConnect = require('./util/database').mongoConnect;
 
@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/admin', adminRoutes);
-// app.use(shopRoutes);
+app.use(shopRoutes);
 
 app.use(page404Controller.send404);
 

@@ -4,7 +4,7 @@ require('dotenv').config()
 
 let _db;
 
-const uri = `mongodb+srv://samatkins:${process.env.MONGODB_PASS}@nodecluster.s7zhua5.mongodb.net/?retryWrites=true&w=majority`
+const uri = `mongodb+srv://samatkins:${process.env.MONGODB_PASS}@nodecluster.s7zhua5.mongodb.net/shop?retryWrites=true&w=majority`
 
 const mongoConnect = (cb) => {
     MongoClient.connect(uri)
