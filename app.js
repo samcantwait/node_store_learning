@@ -19,23 +19,23 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(async (req, res, next) => {
     try {
-        const user = await User.findById('648f12e109c4c51343b8e359');
+        const user = await User.findById('6490dc98527b5358bebf50d6');
         if (!user) throw 'User does not exist!';
         req.user = new User(user.name, user.email, user.cart, user._id);
-        console.log(user);
+        next();
     } catch (err) {
         console.log('error: ', err)
     }
 
     //// OR 
-    // User.findById('648f12e109c4c51343b8e358')
+    // User.findById('648f12e109c4c51343b8e359')
     //     .then(user => {
-    //         console.log(user);
     //         req.user = user;
+    //         console.log('ussserrs: ', user, req.user._id)
+    //         next();
     //     })
     //     .catch(err => console.log(err));
 
-    next();
 })
 
 app.use('/admin', adminRoutes);
@@ -44,6 +44,8 @@ app.use(shopRoutes);
 app.use(page404Controller.send404);
 
 mongoConnect(() => {
+    // const new_user = new User('samcantwait', 'samatkins@gmail.com');
+    // new_user.save();
     const PORT = 3000;
     app.listen(PORT, () => {
         console.log(`Connected on port: ${PORT}`);
