@@ -31,8 +31,7 @@ exports.getIndex = (req, res, next) => {
         });
 }
 
-exports.getCart = async (req, res, next) => {
-    const cartProducts = [];
+exports.getCart = (req, res, next) => {
     req.user
         .getCart()
         .then(products => {
@@ -50,18 +49,16 @@ exports.postCart = (req, res, next) => {
         .then(product => {
             return req.user.addToCart(product);
         })
-        .then(result => null)
+        .then(result => res.redirect('/cart'))
         .catch(err => console.log(err));
-    res.redirect('/cart')
 }
 
 exports.postCartDeleteProduct = (req, res, next) => {
     const { productId } = req.body;
-    req.user.deleteCart(productId);
-    // Product.findById(productId, product => {
-    //     Cart.deleteProduct(productId, product.price);
-    //     res.redirect('/cart')
-    // })
+    req.user
+        .deleteItemFromCart(productId)
+        .then(result => res.redirect('/cart'))
+        .catch(err => console.log(err));
 }
 
 // exports.getCheckout = (req, res, next) => {
@@ -71,9 +68,23 @@ exports.postCartDeleteProduct = (req, res, next) => {
 //     })
 // }
 
-// exports.getOrders = (req, res, next) => {
-//     res.render('shop/orders', {
-//         path: '/orders',
-//         pageTitle: 'Your Orders',
-//     });
-// }
+exports.postOrder = (req, res, next) => {
+    req.user
+        .addOrder()
+        .then(result => {
+            res.redirect('/orders')
+        })
+        .catch(err => console.log(err));
+}
+
+exports.getOrders = (req, res, next) => {
+    req.user.getOrders()
+        .then(orders => {
+            res.render('shop/orders', {
+                path: '/orders',
+                pageTitle: 'Your Orders',
+                orders
+            });
+        })
+
+}
