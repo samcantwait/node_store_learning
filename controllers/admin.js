@@ -10,7 +10,7 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
     const { title, imageUrl, price, description } = req.body;
-    const product = new Product(title, price, description, imageUrl, req.user._id);
+    const product = new Product({ title, price, description, imageUrl, userId: req.user });
     product.save()
         .then(result => {
             res.redirect('/');
@@ -40,13 +40,23 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
     const { productId, title, price, imageUrl, description } = req.body;
-    Product.update(productId, title, price, imageUrl, description);
-    res.redirect('/admin/products')
+    Product.findById(productId).then(product => {
+        product.title = title;
+        product.price = price;
+        product.imageUrl = imageUrl;
+        product.description = description;
+        return product.save();
+    }).then(result => {
+        res.redirect('/admin/products')
+    }).catch(err => console.log(err));
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll()
+    Product.find()
+        // .select('title price -_id')  You can select specific fields
+        .populate('userId')
         .then(products => {
+            console.log(products)
             res.render('admin/products', {
                 prod: products,
                 pageTitle: 'Admin Products',
@@ -57,6 +67,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const { productId } = req.body;
-    Product.delete(productId);
-    res.redirect('/admin/products');
+    Product.findByIdAndRemove(productId)
+        .then(() => res.redirect('/products'))
+        .catch(err => console.log(err));
 }
