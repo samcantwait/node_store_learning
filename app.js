@@ -48,7 +48,8 @@ app.use((req, res, next) => {
             req.user = user;
             next();
         })
-})
+        .catch(err => console.log(err));
+});
 
 // Expressjs has locals. These are only passed into the views which are rendered.
 app.use((req, res, next) => {

@@ -46,19 +46,24 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
     const { productId, title, price, imageUrl, description } = req.body;
-    Product.findById(productId).then(product => {
-        product.title = title;
-        product.price = price;
-        product.imageUrl = imageUrl;
-        product.description = description;
-        return product.save();
-    }).then(result => {
-        res.redirect('/admin/products')
-    }).catch(err => console.log(err));
+    Product.findById(productId)
+        .then(product => {
+            if (product.userId.toString() !== req.user._id.toString()) {
+                return res.redirect('/');
+            }
+            product.title = title;
+            product.price = price;
+            product.imageUrl = imageUrl;
+            product.description = description;
+            return product.save()
+                .then(result => {
+                    res.redirect('/admin/products');
+                })
+        }).catch(err => console.log(err));
 }
 
 exports.getProducts = (req, res, next) => {
-    Product.find()
+    Product.find({ userId: req.user._id })
         // .select('title price -_id')  You can select specific fields
         .populate('userId')
         .then(products => {
@@ -72,7 +77,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const { productId } = req.body;
-    Product.findByIdAndRemove(productId)
+    Product.deleteOne({ _id: productId, userId: req.user._id })
         .then(() => res.redirect('/products'))
         .catch(err => console.log(err));
 }
