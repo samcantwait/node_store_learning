@@ -5,23 +5,50 @@ exports.getAddProduct = (req, res, next) => {
         pageTitle: 'Add Product',
         path: '/admin/add-product',
         editing: false,
+        errorMessage: '',
+        validationErrors: []
     });
 }
 
 exports.postAddProduct = (req, res, next) => {
-    const { title, imageUrl, price, description } = req.body;
+    const { title, imageURL, price, description } = req.body;
+    const image = req.file;
+    console.log(image)
+    if (!image) {
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Add Product',
+            path: '/admin/add-product',
+            editing: false,
+            hasError: true,
+            product: {
+                title,
+                price,
+                description,
+                imageUrl: `/${image.path.replace('\\', '/')}`
+            },
+            errorMessage: 'Attached file is not an image.',
+            validationErrors: []
+        });
+    }
+
+    const imageUrl = image.path;
     const product = new Product({
         title,
         price,
         description,
         imageUrl,
+        image,
         userId: req.user
     });
     product.save()
         .then(result => {
             res.redirect('/');
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
+        });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -40,12 +67,19 @@ exports.getEditProduct = (req, res, next) => {
                 path: '/admin/edit-product',
                 editing: editMode,
                 product,
+                errorMessage: '',
             });
+        })
+        .catch(err => {
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error);
         })
 }
 
 exports.postEditProduct = (req, res, next) => {
     const { productId, title, price, imageUrl, description } = req.body;
+    const image = req.file;
     Product.findById(productId)
         .then(product => {
             if (product.userId.toString() !== req.user._id.toString()) {
@@ -53,7 +87,9 @@ exports.postEditProduct = (req, res, next) => {
             }
             product.title = title;
             product.price = price;
-            product.imageUrl = imageUrl;
+            if (image) {
+                product.imageUrl = `/${image.path.replace('\\', '/')}`;
+            }
             product.description = description;
             return product.save()
                 .then(result => {
