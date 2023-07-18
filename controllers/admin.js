@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const fileHelper = require('../util/file');
 
 exports.getAddProduct = (req, res, next) => {
     res.render('admin/edit-product', {
@@ -11,7 +12,7 @@ exports.getAddProduct = (req, res, next) => {
 }
 
 exports.postAddProduct = (req, res, next) => {
-    const { title, imageURL, price, description } = req.body;
+    const { title, price, description } = req.body;
     const image = req.file;
     console.log(image)
     if (!image) {
@@ -24,14 +25,14 @@ exports.postAddProduct = (req, res, next) => {
                 title,
                 price,
                 description,
-                imageUrl: `/${image.path.replace('\\', '/')}`
+                imageUrl: `/${image.path.replace(/\\/g, '/')}`
             },
             errorMessage: 'Attached file is not an image.',
             validationErrors: []
         });
     }
 
-    const imageUrl = image.path;
+    const imageUrl = '/' + image.path.replace(/\\/g, '/');
     const product = new Product({
         title,
         price,
@@ -88,6 +89,7 @@ exports.postEditProduct = (req, res, next) => {
             product.title = title;
             product.price = price;
             if (image) {
+                fileHelper.deleteFile(product.imageUrl);
                 product.imageUrl = `/${image.path.replace('\\', '/')}`;
             }
             product.description = description;
@@ -113,7 +115,14 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const { productId } = req.body;
-    Product.deleteOne({ _id: productId, userId: req.user._id })
-        .then(() => res.redirect('/products'))
-        .catch(err => console.log(err));
+    Product.findById(productId)
+        .then(product => {
+            if (!product) {
+                return next(new Error('Product not found'))
+            }
+            fileHelper.deleteFile(product.imageUrl);
+            return Product.deleteOne({ _id: productId, userId: req.user._id })
+        })
+        .then(() => res.redirect('/admin/products'))
+        .catch(err => next(err));
 }
