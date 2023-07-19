@@ -1,20 +1,20 @@
-const path = require('path');
-
 const express = require('express');
 const router = express.Router();
 
-const adminController = require('../controllers/admin')
+const adminController = require('../controllers/admin');
+const isAuth = require('../middleware/is-auth');
 
-router.get('/add-product', adminController.getAddProduct);
+// If not authed then user if redirected and next is never called so it never gets to next middleware.
+router.get('/add-product', isAuth, adminController.getAddProduct);
 
-router.get('/products', adminController.getProducts)
+router.get('/products', isAuth, adminController.getProducts)
 
-router.post('/add-product', adminController.postAddProduct);
+router.post('/add-product', isAuth, adminController.postAddProduct);
 
-router.post('/edit-product', adminController.postEditProduct);
+router.post('/edit-product', isAuth, adminController.postEditProduct);
 
-router.get('/edit-product/:productId', adminController.getEditProduct);
+router.get('/edit-product/:productId', isAuth, adminController.getEditProduct);
 
-router.post('/delete-product', adminController.postDeleteProduct)
+router.post('/delete-product', isAuth, adminController.postDeleteProduct)
 
 module.exports = router;
