@@ -1,35 +1,39 @@
 <%- include('../layouts/main-layout.ejs') %>
-<link rel="stylesheet" href="/css/product.css">
-<link rel="stylesheet" href="/css/cart.css">
-<%- include('../layouts/partials/navigation.ejs') %>
+    <link rel="stylesheet" href="/css/product.css">
+    <link rel="stylesheet" href="/css/cart.css">
+    <%- include('../layouts/partials/navigation.ejs') %>
 
-    <main>
-        <h1>
-            <%= pageTitle %>
-        </h1>
-        <% if (products.length) { %>
-            <ul class="cart__item-list">
-                <% products.forEach(p => { %>
-                    <li class="cart__item">
-                        <h1><%= p.productId.title %></h1> 
-                        <h2>Quantity: <%= p.quantity %></h2>
-                        <form action="/cart-delete-item" method="POST">
-                            <input type="hidden" value="<%= p.productId._id %>" name="productId">
-                            <input type="hidden" value="<%= csrfToken %>" name="_csrf">
-                            <button class="btn danger" type="submit">Delete</button>
-                        </form>
-                    </li>
-                <% }) %>
-            </ul>
-            <hr>
-            <div class="centered">
-                <form action="/create-order" method="POST">
+        <main>
+            <h1>
+                <%= pageTitle %>
+            </h1>
+            <% if (products.length) { %>
+                <ul class="cart__item-list">
+                    <% products.forEach(p=> { %>
+                        <li class="cart__item">
+                            <h1>
+                                <%= p.productId.title %>
+                            </h1>
+                            <h2>Quantity: <%= p.quantity %>
+                            </h2>
+                            <form action="/cart-delete-item" method="POST">
+                                <input type="hidden" value="<%= p.productId._id %>" name="productId">
+                                <input type="hidden" value="<%= csrfToken %>" name="_csrf">
+                                <button class="btn danger" type="submit">Delete</button>
+                            </form>
+                        </li>
+                        <% }) %>
+                </ul>
+                <hr>
+                <div class="centered">
+                    <!-- <form action="/create-order" method="POST">
                     <input type="hidden" value="<%= csrfToken %>" name="_csrf">
                     <button type="submit" class="btn">Order Now!</button>
-                </form>
-            </div>
-        <% } else { %>
-            <h2>There are currently no products in the cart.</h2>
-        <% } %>
-    </main>
-    <%- include('../layouts/partials/end.ejs') %>
+                </form> -->
+                    <a class="btn" href="/checkout">Order Now!</a>
+                </div>
+                <% } else { %>
+                    <h2>There are currently no products in the cart.</h2>
+                    <% } %>
+        </main>
+        <%- include('../layouts/partials/end.ejs') %>
