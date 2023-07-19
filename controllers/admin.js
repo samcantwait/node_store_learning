@@ -113,8 +113,8 @@ exports.getProducts = (req, res, next) => {
         });
 }
 
-exports.postDeleteProduct = (req, res, next) => {
-    const { productId } = req.body;
+exports.deleteProduct = (req, res, next) => {
+    const { productId } = req.params;
     Product.findById(productId)
         .then(product => {
             if (!product) {
@@ -123,6 +123,8 @@ exports.postDeleteProduct = (req, res, next) => {
             fileHelper.deleteFile(product.imageUrl);
             return Product.deleteOne({ _id: productId, userId: req.user._id })
         })
-        .then(() => res.redirect('/admin/products'))
-        .catch(err => next(err));
+        .then(() => {
+            res.status(200).json({ message: 'Success.' })
+        })
+        .catch(() => res.status(500).json({ message: 'Failed to delete product.' }));
 }
